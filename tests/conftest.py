@@ -29,11 +29,9 @@ os.environ.setdefault("RATE_LIMIT_STORAGE_URI", "memory://")
 os.environ.setdefault("RATE_LIMIT_TOKEN", "1000/minute")
 os.environ.setdefault("RATE_LIMIT_ORDERS", "1000/minute")
 
-
 # ---------------------------------------------------------------------------
 # Small test doubles
 # ---------------------------------------------------------------------------
-
 
 @dataclass(slots=True)
 class FakeUser:
@@ -73,11 +71,9 @@ class CallRecorder:
     def record(self, *args: Any, **kwargs: Any) -> None:
         self.calls.append((args, kwargs))
 
-
 # ---------------------------------------------------------------------------
 # FastAPI app/client fixtures (no lifespan/external connections)
 # ---------------------------------------------------------------------------
-
 
 @pytest.fixture()
 def app() -> FastAPI:
@@ -112,4 +108,3 @@ def fake_redis() -> FakeRedis:
 @pytest.fixture()
 def recorder() -> CallRecorder:
     return CallRecorder()
-
