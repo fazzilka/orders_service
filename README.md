@@ -13,7 +13,7 @@
 - Celery — фоновые задачи (broker/backend: Redis)
 - JWT OAuth2 Password Flow (`/register/`, `/token/`)
 - CORS (origins из env)
-- Rate limiting по IP (slowapi) для `/token/` и `/orders/*`
+- Rate limiting по IP (slowapi) для `/token/` и `/orders/`
 
 ## Быстрый старт (Docker)
 
