@@ -20,7 +20,7 @@ def test_publish_new_order_builds_message_and_uses_routing_key() -> None:
     order_id = uuid4()
     user_id = uuid4()
 
-    anyio.run(events_service.publish_new_order, exchange, order_id=order_id, user_id=user_id)
+    anyio.run(events_service.publish_new_order, exchange, order_id, user_id)
 
     assert len(exchange.published) == 1
     message, routing_key = exchange.published[0]

@@ -6,6 +6,10 @@ from app.core.auth_cookies import USER_ACCESS_COOKIE, USER_REFRESH_COOKIE
 from app.core.security import create_refresh_token
 
 
+def _cookie_names(client) -> set[str]:  # type: ignore[no-untyped-def]
+    return {cookie.name for cookie in client.cookies.jar}
+
+
 @pytest.fixture()
 def _override_db(app):  # type: ignore[no-untyped-def]
     import app.api.v1.auth as auth_module
@@ -116,7 +120,7 @@ def test_refresh_success_sets_new_pair_and_cookies(
     monkeypatch.setattr(auth_module, "get_user_by_id", fake_get_user_by_id)
 
     refresh_token = create_refresh_token(subject=str(fake_user.id), email=fake_user.email)
-    client.cookies.set(USER_REFRESH_COOKIE, refresh_token)
+    client.cookies.set(USER_REFRESH_COOKIE, refresh_token, domain="testserver.local", path="/")
 
     response = client.post("/token/refresh/")
 
@@ -125,18 +129,24 @@ def test_refresh_success_sets_new_pair_and_cookies(
     assert isinstance(payload["access_token"], str) and payload["access_token"]
     assert isinstance(payload["refresh_token"], str) and payload["refresh_token"]
 
-    assert client.cookies.get(USER_ACCESS_COOKIE)
-    assert client.cookies.get(USER_REFRESH_COOKIE)
+    assert USER_ACCESS_COOKIE in _cookie_names(client)
+    assert USER_REFRESH_COOKIE in _cookie_names(client)
 
 
 def test_logout_clears_cookies(client, _override_db):  # type: ignore[no-untyped-def]
-    client.cookies.set(USER_ACCESS_COOKIE, "access")
-    client.cookies.set(USER_REFRESH_COOKIE, "refresh")
+    client.cookies.set(USER_ACCESS_COOKIE, "access", domain="testserver.local", path="/")
+    client.cookies.set(USER_REFRESH_COOKIE, "refresh", domain="testserver.local", path="/")
 
     response = client.post("/logout/")
 
     assert response.status_code == 204
 
-    # CookieJar should drop them after delete_cookie responses.
-    assert not client.cookies.get(USER_ACCESS_COOKIE)
-    assert not client.cookies.get(USER_REFRESH_COOKIE)
+    set_cookie_headers = response.headers.get_list("set-cookie")
+    assert any(
+        header.startswith(f"{USER_ACCESS_COOKIE}=") and "Max-Age=0" in header
+        for header in set_cookie_headers
+    )
+    assert any(
+        header.startswith(f"{USER_REFRESH_COOKIE}=") and "Max-Age=0" in header
+        for header in set_cookie_headers
+    )
