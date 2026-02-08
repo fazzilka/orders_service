@@ -1,4 +1,4 @@
-.PHONY: run logs down lint type upgrade downgrade migrate
+.PHONY: run logs down lint type test upgrade downgrade migrate
 
 run:
 	docker compose up --build -d
@@ -16,6 +16,9 @@ lint:
 type:
 	uv run mypy app consumer worker scripts
 
+test:
+	uv run pytest
+
 upgrade:
 	uv run alembic upgrade head
 
@@ -26,4 +29,3 @@ downgrade:
 # make migrate MSG="add something"
 migrate:
 	uv run alembic revision --autogenerate -m "$(MSG)"
-
