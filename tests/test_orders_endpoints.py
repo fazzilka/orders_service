@@ -11,20 +11,20 @@ from app.services import cache as cache_service
 
 
 @pytest.fixture()
-def _override_orders_deps(app, fake_redis, monkeypatch, fake_user):  # type: ignore[no-untyped-def]
+def _override_orders_deps(app, fake_redis, monkeypatch, fake_user):
     import app.api.deps as deps_module
     import app.api.v1.orders as orders_module
 
-    async def override_get_db():  # type: ignore[no-untyped-def]
+    async def override_get_db():
         yield object()
 
-    def override_get_redis():  # type: ignore[no-untyped-def]
+    def override_get_redis():
         return fake_redis
 
-    def override_get_exchange():  # type: ignore[no-untyped-def]
+    def override_get_exchange():
         return object()
 
-    async def fake_get_user_by_id(session, user_id: UUID):  # type: ignore[no-untyped-def]
+    async def fake_get_user_by_id(session, user_id: UUID):
         return fake_user
 
     monkeypatch.setattr(deps_module, "get_user_by_id", fake_get_user_by_id)
@@ -44,7 +44,7 @@ def _auth_header(user_id: UUID, email: str) -> dict[str, str]:
 
 def test_create_order_caches_and_publishes_event(
     client, app, fake_user, fake_redis, monkeypatch, recorder, _override_orders_deps
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.orders as orders_module
 
     order_id = uuid4()
@@ -57,10 +57,10 @@ def test_create_order_caches_and_publishes_event(
         status = OrderStatus.PENDING
         created_at = datetime.now(UTC)
 
-    async def fake_create_order(session, user_id: UUID, order_in):  # type: ignore[no-untyped-def]
+    async def fake_create_order(session, user_id: UUID, order_in):
         return FakeOrder()
 
-    async def fake_publish_new_order(exchange, order_id: UUID, user_id: UUID):  # type: ignore[no-untyped-def]
+    async def fake_publish_new_order(exchange, order_id: UUID, user_id: UUID):
         recorder.record(exchange=exchange, order_id=order_id, user_id=user_id)
 
     monkeypatch.setattr(orders_module.orders_service, "create_order", fake_create_order)
@@ -90,7 +90,7 @@ def test_create_order_caches_and_publishes_event(
 
 def test_get_order_returns_from_cache(
     client, fake_user, fake_redis, monkeypatch, _override_orders_deps
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.orders as orders_module
 
     order_id = uuid4()
@@ -104,7 +104,7 @@ def test_get_order_returns_from_cache(
     )
     anyio.run(cache_service.set_order_cache, fake_redis, order)
 
-    async def should_not_hit_db(session, order_id: UUID):  # type: ignore[no-untyped-def]
+    async def should_not_hit_db(session, order_id: UUID):
         raise AssertionError("DB should not be used when cache is present")
 
     monkeypatch.setattr(orders_module.orders_service, "get_order_by_id", should_not_hit_db)
@@ -122,7 +122,7 @@ def test_get_order_returns_from_cache(
 
 def test_get_order_forbidden_when_cached_order_belongs_to_other_user(
     client, fake_user, fake_redis, _override_orders_deps
-):  # type: ignore[no-untyped-def]
+):
     order_id = uuid4()
     order = OrderRead(
         id=order_id,
@@ -144,10 +144,10 @@ def test_get_order_forbidden_when_cached_order_belongs_to_other_user(
 
 def test_get_order_404_when_missing_in_db(
     client, fake_user, monkeypatch, _override_orders_deps
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.orders as orders_module
 
-    async def fake_get_order_by_id(session, order_id: UUID):  # type: ignore[no-untyped-def]
+    async def fake_get_order_by_id(session, order_id: UUID):
         return None
 
     monkeypatch.setattr(orders_module.orders_service, "get_order_by_id", fake_get_order_by_id)
@@ -163,7 +163,7 @@ def test_get_order_404_when_missing_in_db(
 
 def test_update_order_status_updates_cache(
     client, fake_user, fake_redis, monkeypatch, _override_orders_deps
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.orders as orders_module
 
     order_id = uuid4()
@@ -176,10 +176,10 @@ def test_update_order_status_updates_cache(
         status = OrderStatus.PENDING
         created_at = datetime.now(UTC)
 
-    async def fake_get_order_by_id(session, order_id: UUID):  # type: ignore[no-untyped-def]
+    async def fake_get_order_by_id(session, order_id: UUID):
         return FakeOrder()
 
-    async def fake_update_order_status(session, order, status):  # type: ignore[no-untyped-def]
+    async def fake_update_order_status(session, order, status):
         order.status = status
         return order
 
@@ -202,10 +202,10 @@ def test_update_order_status_updates_cache(
 
 def test_update_order_status_rejects_refresh_token(
     client, fake_user, monkeypatch, _override_orders_deps
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.orders as orders_module
 
-    async def fake_get_order_by_id(session, order_id: UUID):  # type: ignore[no-untyped-def]
+    async def fake_get_order_by_id(session, order_id: UUID):
         return None
 
     monkeypatch.setattr(orders_module.orders_service, "get_order_by_id", fake_get_order_by_id)
@@ -221,7 +221,7 @@ def test_update_order_status_rejects_refresh_token(
 
 def test_list_user_orders_forbidden_when_not_self(
     client, fake_user, _override_orders_deps
-):  # type: ignore[no-untyped-def]
+):
     other_user_id = uuid4()
     response = client.get(
         f"/orders/user/{other_user_id}/",
@@ -233,7 +233,7 @@ def test_list_user_orders_forbidden_when_not_self(
 
 def test_list_user_orders_success(
     client, fake_user, monkeypatch, _override_orders_deps
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.orders as orders_module
 
     class FakeOrder:
@@ -245,7 +245,7 @@ def test_list_user_orders_success(
             self.status = status
             self.created_at = datetime.now(UTC)
 
-    async def fake_list_orders_by_user(session, user_id: UUID):  # type: ignore[no-untyped-def]
+    async def fake_list_orders_by_user(session, user_id: UUID):
         return [FakeOrder(uuid4(), OrderStatus.PENDING), FakeOrder(uuid4(), OrderStatus.SHIPPED)]
 
     monkeypatch.setattr(orders_module.orders_service, "list_orders_by_user", fake_list_orders_by_user)

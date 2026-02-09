@@ -8,15 +8,6 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-
-# ---------------------------------------------------------------------------
-# Test environment bootstrap
-#
-# `app.core.config.settings` is instantiated at import time, and it requires
-# several env vars. We set safe defaults here so any import of `app.*` works
-# in tests without having a real Postgres/Redis/RabbitMQ running.
-# ---------------------------------------------------------------------------
-
 os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost:5432/testdb")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
@@ -29,9 +20,6 @@ os.environ.setdefault("RATE_LIMIT_STORAGE_URI", "memory://")
 os.environ.setdefault("RATE_LIMIT_TOKEN", "1000/minute")
 os.environ.setdefault("RATE_LIMIT_ORDERS", "1000/minute")
 
-# ---------------------------------------------------------------------------
-# Small test doubles
-# ---------------------------------------------------------------------------
 
 @dataclass(slots=True)
 class FakeUser:
@@ -57,7 +45,7 @@ class FakeRedis:
     async def get(self, key: str) -> str | None:
         return self._data.get(key)
 
-    async def set(self, key: str, value: str, ex: int | None = None) -> None:  # noqa: ARG002
+    async def set(self, key: str, value: str, ex: int | None = None) -> None:
         self._data[key] = value
 
     async def delete(self, key: str) -> None:
@@ -71,9 +59,6 @@ class CallRecorder:
     def record(self, *args: Any, **kwargs: Any) -> None:
         self.calls.append((args, kwargs))
 
-# ---------------------------------------------------------------------------
-# FastAPI app/client fixtures (no lifespan/external connections)
-# ---------------------------------------------------------------------------
 
 @pytest.fixture()
 def app() -> FastAPI:

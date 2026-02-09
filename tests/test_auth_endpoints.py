@@ -6,15 +6,15 @@ from app.core.auth_cookies import USER_ACCESS_COOKIE, USER_REFRESH_COOKIE
 from app.core.security import create_refresh_token
 
 
-def _cookie_names(client) -> set[str]:  # type: ignore[no-untyped-def]
+def _cookie_names(client) -> set[str]:
     return {cookie.name for cookie in client.cookies.jar}
 
 
 @pytest.fixture()
-def _override_db(app):  # type: ignore[no-untyped-def]
+def _override_db(app):
     import app.api.v1.auth as auth_module
 
-    async def override_get_db():  # type: ignore[no-untyped-def]
+    async def override_get_db():
         yield object()
 
     app.dependency_overrides[auth_module.get_db] = override_get_db
@@ -22,10 +22,10 @@ def _override_db(app):  # type: ignore[no-untyped-def]
     app.dependency_overrides.clear()
 
 
-def test_register_success(client, fake_user, monkeypatch, _override_db):  # type: ignore[no-untyped-def]
+def test_register_success(client, fake_user, monkeypatch, _override_db):
     import app.api.v1.auth as auth_module
 
-    async def fake_create_user(session, email: str, password: str):  # type: ignore[no-untyped-def]
+    async def fake_create_user(session, email: str, password: str):
         return fake_user
 
     monkeypatch.setattr(auth_module, "create_user", fake_create_user)
@@ -42,11 +42,11 @@ def test_register_success(client, fake_user, monkeypatch, _override_db):  # type
     assert "created_at" in payload
 
 
-def test_register_conflict(client, monkeypatch, _override_db):  # type: ignore[no-untyped-def]
+def test_register_conflict(client, monkeypatch, _override_db):
     import app.api.v1.auth as auth_module
     from app.services.users import UserAlreadyExistsError
 
-    async def fake_create_user(session, email: str, password: str):  # type: ignore[no-untyped-def]
+    async def fake_create_user(session, email: str, password: str):
         raise UserAlreadyExistsError
 
     monkeypatch.setattr(auth_module, "create_user", fake_create_user)
@@ -61,7 +61,7 @@ def test_register_conflict(client, monkeypatch, _override_db):  # type: ignore[n
 
 def test_token_success_returns_pair_and_sets_cookies(
     client, fake_user, monkeypatch, _override_db
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.auth as auth_module
 
     async def fake_authenticate_user(session, email: str, password: str):  # type: ignore[no-untyped-def]
@@ -87,10 +87,10 @@ def test_token_success_returns_pair_and_sets_cookies(
 
 def test_token_invalid_credentials_returns_401(
     client, monkeypatch, _override_db
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.auth as auth_module
 
-    async def fake_authenticate_user(session, email: str, password: str):  # type: ignore[no-untyped-def]
+    async def fake_authenticate_user(session, email: str, password: str):
         return None
 
     monkeypatch.setattr(auth_module, "authenticate_user", fake_authenticate_user)
@@ -104,17 +104,17 @@ def test_token_invalid_credentials_returns_401(
     assert response.status_code == 401
 
 
-def test_refresh_missing_cookie_returns_401(client, _override_db):  # type: ignore[no-untyped-def]
+def test_refresh_missing_cookie_returns_401(client, _override_db):
     response = client.post("/token/refresh/")
     assert response.status_code == 401
 
 
 def test_refresh_success_sets_new_pair_and_cookies(
     client, fake_user, monkeypatch, _override_db
-):  # type: ignore[no-untyped-def]
+):
     import app.api.v1.auth as auth_module
 
-    async def fake_get_user_by_id(session, user_id: UUID):  # type: ignore[no-untyped-def]
+    async def fake_get_user_by_id(session, user_id: UUID):
         return fake_user
 
     monkeypatch.setattr(auth_module, "get_user_by_id", fake_get_user_by_id)
@@ -133,7 +133,7 @@ def test_refresh_success_sets_new_pair_and_cookies(
     assert USER_REFRESH_COOKIE in _cookie_names(client)
 
 
-def test_logout_clears_cookies(client, _override_db):  # type: ignore[no-untyped-def]
+def test_logout_clears_cookies(client, _override_db):
     client.cookies.set(USER_ACCESS_COOKIE, "access", domain="testserver.local", path="/")
     client.cookies.set(USER_REFRESH_COOKIE, "refresh", domain="testserver.local", path="/")
 
