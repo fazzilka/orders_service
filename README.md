@@ -108,3 +108,20 @@ docker compose logs -f consumer celery-worker
 - `make down` — остановить и удалить volume'ы
 - `make lint` — формат + линт (ruff)
 - `make upgrade` — применить миграции (локально)
+
+
+
+- Добавил тестовую инфраструктуру: pytest.ini:1, цель make test в Makefile:1,
+    базовые фикстуры/фейки в tests/conftest.py:1.
+  - Покрыл unit-тестами: tests/test_security.py:1, tests/test_auth_cookies.py:1,
+    tests/test_cache.py:1, tests/test_events.py:1.
+  - Покрыл API-тестами (через TestClient, без реальных Postgres/Redis/Rabbit):
+    tests/test_auth_endpoints.py:1, tests/test_orders_endpoints.py:1 (включая
+    проверку, что refresh-токен не подходит для /orders/*).
+  - Прогон: uv run pytest -q → 24 passed.
+
+
+Как запускать у себя:
+
+  - `uv sync --extra dev`
+  - `make test` (или `uv run pytest`)
