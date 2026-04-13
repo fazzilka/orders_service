@@ -53,4 +53,3 @@ def test_order_cache_invalid_payload_is_invalidated(fake_redis: FakeRedis) -> No
 
     assert cached is None
     assert anyio.run(fake_redis.get, key) is None
-
