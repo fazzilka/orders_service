@@ -25,4 +25,3 @@ class OrderRead(BaseModel):
     total_price: float
     status: OrderStatus
     created_at: datetime
-
