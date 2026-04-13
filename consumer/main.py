@@ -7,15 +7,15 @@ from typing import Any
 
 import aio_pika
 from aio_pika import ExchangeType
+from aio_pika.abc import AbstractIncomingMessage, AbstractQueue
 
 from app.core.config import settings
 from worker.celery_app import celery_app
 
-
 logger = logging.getLogger("consumer")
 
 
-async def handle_message(message: aio_pika.IncomingMessage) -> None:
+async def handle_message(message: AbstractIncomingMessage) -> None:
     async with message.process():
         payload: dict[str, Any] = json.loads(message.body)
 
@@ -39,7 +39,7 @@ async def handle_message(message: aio_pika.IncomingMessage) -> None:
         logger.info("Celery task queued: process_order(order_id=%s)", order_id)
 
 
-async def consume(queue: aio_pika.Queue, stop_event: asyncio.Event) -> None:
+async def consume(queue: AbstractQueue, stop_event: asyncio.Event) -> None:
     async with queue.iterator() as queue_iter:
         async for message in queue_iter:
             if stop_event.is_set():
@@ -87,4 +87,3 @@ if __name__ == "__main__":
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     )
     asyncio.run(main())
-
