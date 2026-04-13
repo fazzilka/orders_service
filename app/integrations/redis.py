@@ -1,9 +1,8 @@
 import asyncio
-import logging
 import inspect
+import logging
 
 from redis.asyncio import Redis
-
 
 logger = logging.getLogger(__name__)
 
