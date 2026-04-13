@@ -11,7 +11,6 @@ from app.core.rate_limit import setup_rate_limiting
 from app.integrations.rabbit import RabbitResources, close_rabbit, connect_rabbit
 from app.integrations.redis import close_redis, create_redis
 
-
 configure_logging()
 
 
@@ -45,4 +44,3 @@ app.include_router(orders_router, tags=["orders"])
 @app.get("/health/", tags=["health"])
 async def health() -> dict[str, str]:
     return {"status": "ok"}
-
