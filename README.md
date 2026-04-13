@@ -117,9 +117,10 @@ docker compose logs -f consumer celery-worker
   - Покрыл API-тестами (через TestClient, без реальных Postgres/Redis/Rabbit):
     tests/test_auth_endpoints.py:1, tests/test_orders_endpoints.py:1 (включая
     проверку, что refresh-токен не подходит для /orders/*).
-  - Прогон: uv run pytest -q → 24 passed.
+  - Прогон: `uv run --extra dev pytest -q` → `24 passed`.
 
 Как запускать у себя:
 
 - `uv sync --extra dev`
-- `make test` (или `uv run pytest`)
+- `make test` (или `uv run --extra dev pytest`)
+- `make lint` (или `uv run --extra dev ruff check .`)
