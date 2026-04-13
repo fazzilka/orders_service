@@ -59,9 +59,7 @@ def test_register_conflict(client, monkeypatch, _override_db):
     assert response.status_code == 409
 
 
-def test_token_success_returns_pair_and_sets_cookies(
-    client, fake_user, monkeypatch, _override_db
-):
+def test_token_success_returns_pair_and_sets_cookies(client, fake_user, monkeypatch, _override_db):
     import app.api.v1.auth as auth_module
 
     async def fake_authenticate_user(session, email: str, password: str):  # type: ignore[no-untyped-def]
@@ -85,9 +83,7 @@ def test_token_success_returns_pair_and_sets_cookies(
     assert client.cookies.get(USER_REFRESH_COOKIE)
 
 
-def test_token_invalid_credentials_returns_401(
-    client, monkeypatch, _override_db
-):
+def test_token_invalid_credentials_returns_401(client, monkeypatch, _override_db):
     import app.api.v1.auth as auth_module
 
     async def fake_authenticate_user(session, email: str, password: str):
@@ -109,9 +105,7 @@ def test_refresh_missing_cookie_returns_401(client, _override_db):
     assert response.status_code == 401
 
 
-def test_refresh_success_sets_new_pair_and_cookies(
-    client, fake_user, monkeypatch, _override_db
-):
+def test_refresh_success_sets_new_pair_and_cookies(client, fake_user, monkeypatch, _override_db):
     import app.api.v1.auth as auth_module
 
     async def fake_get_user_by_id(session, user_id: UUID):
