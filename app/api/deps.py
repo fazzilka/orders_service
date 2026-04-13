@@ -14,7 +14,6 @@ from app.db.models.user import User
 from app.db.session import async_session_maker
 from app.services.users import get_user_by_id
 
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token/", auto_error=False)
 
 
@@ -72,8 +71,8 @@ async def get_current_user(
             raise credentials_exception
 
         user_id = UUID(subject)
-    except (JWTError, ValueError):
-        raise credentials_exception
+    except (JWTError, ValueError) as err:
+        raise credentials_exception from err
 
     user = await get_user_by_id(session, user_id)
     if user is None:
