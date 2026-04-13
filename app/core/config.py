@@ -22,12 +22,16 @@ class Settings(BaseSettings):
 
     jwt_secret_key: str = Field(validation_alias="JWT_SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", validation_alias="JWT_ALGORITHM")
-    access_token_expire_minutes: int = Field(default=30, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    access_token_expire_minutes: int = Field(
+        default=30, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES"
+    )
     refresh_token_expire_days: int = Field(default=7, validation_alias="REFRESH_TOKEN_EXPIRE_DAYS")
 
     cors_origins_raw: str = Field(default="", validation_alias="CORS_ORIGINS")
 
-    rate_limit_storage_uri: str | None = Field(default=None, validation_alias="RATE_LIMIT_STORAGE_URI")
+    rate_limit_storage_uri: str | None = Field(
+        default=None, validation_alias="RATE_LIMIT_STORAGE_URI"
+    )
     rate_limit_token: str = Field(default="5/minute", validation_alias="RATE_LIMIT_TOKEN")
     rate_limit_orders: str = Field(default="20/minute", validation_alias="RATE_LIMIT_ORDERS")
 
@@ -58,7 +62,7 @@ class Settings(BaseSettings):
         return [item.strip() for item in raw.split(",") if item.strip()]
 
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
 
 
 @lru_cache
