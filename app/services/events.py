@@ -7,7 +7,6 @@ from aio_pika.abc import AbstractExchange
 
 from app.core.config import settings
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -20,4 +19,3 @@ async def publish_new_order(exchange: AbstractExchange, order_id: UUID, user_id:
     )
     await exchange.publish(message, routing_key=settings.rabbit_routing_key)
     logger.info("Published new_order event: order_id=%s user_id=%s", order_id, user_id)
-
