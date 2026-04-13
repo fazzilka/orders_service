@@ -1,5 +1,7 @@
 .PHONY: run logs down lint type test upgrade downgrade migrate
 
+UV_DEV_RUN = uv run --extra dev
+
 run:
 	docker compose up --build -d
 
@@ -10,14 +12,14 @@ down:
 	docker compose down -v
 
 lint:
-	uv run ruff format .
-	uv run ruff check --fix .
+	$(UV_DEV_RUN) ruff format .
+	$(UV_DEV_RUN) ruff check --fix .
 
 type:
-	uv run mypy app consumer worker scripts
+	$(UV_DEV_RUN) mypy app consumer worker scripts
 
 test:
-	uv run pytest
+	$(UV_DEV_RUN) pytest
 
 upgrade:
 	uv run alembic upgrade head
