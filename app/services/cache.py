@@ -7,7 +7,6 @@ from redis.exceptions import RedisError
 from app.core.config import settings
 from app.schemas.order import OrderRead
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -48,4 +47,3 @@ async def invalidate_order_cache(redis: Redis, order_id: UUID) -> None:
         await redis.delete(key)
     except RedisError:
         logger.exception("Redis DEL failed for key=%s", key)
-
