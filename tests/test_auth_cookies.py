@@ -10,9 +10,7 @@ from app.core.auth_cookies import (
 
 def _set_cookie_headers(response: Response) -> list[str]:
     return [
-        value.decode("utf-8")
-        for key, value in response.raw_headers
-        if key.lower() == b"set-cookie"
+        value.decode("utf-8") for key, value in response.raw_headers if key.lower() == b"set-cookie"
     ]
 
 
@@ -32,4 +30,3 @@ def test_clear_user_cookies_deletes_two_cookies() -> None:
     headers = _set_cookie_headers(response)
     assert any(header.startswith(f"{USER_ACCESS_COOKIE}=") for header in headers)
     assert any(header.startswith(f"{USER_REFRESH_COOKIE}=") for header in headers)
-
