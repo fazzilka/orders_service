@@ -15,7 +15,6 @@ from app.services import cache as cache_service
 from app.services import events as events_service
 from app.services import orders as orders_service
 
-
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -107,4 +106,3 @@ async def list_user_orders(
 
     orders = await orders_service.list_orders_by_user(session, user_id=user_id)
     return [OrderRead.model_validate(order) for order in orders]
-
