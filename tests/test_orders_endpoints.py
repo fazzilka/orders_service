@@ -142,9 +142,7 @@ def test_get_order_forbidden_when_cached_order_belongs_to_other_user(
     assert response.status_code == 403
 
 
-def test_get_order_404_when_missing_in_db(
-    client, fake_user, monkeypatch, _override_orders_deps
-):
+def test_get_order_404_when_missing_in_db(client, fake_user, monkeypatch, _override_orders_deps):
     import app.api.v1.orders as orders_module
 
     async def fake_get_order_by_id(session, order_id: UUID):
@@ -184,7 +182,9 @@ def test_update_order_status_updates_cache(
         return order
 
     monkeypatch.setattr(orders_module.orders_service, "get_order_by_id", fake_get_order_by_id)
-    monkeypatch.setattr(orders_module.orders_service, "update_order_status", fake_update_order_status)
+    monkeypatch.setattr(
+        orders_module.orders_service, "update_order_status", fake_update_order_status
+    )
 
     response = client.patch(
         f"/orders/{order_id}/",
@@ -219,9 +219,7 @@ def test_update_order_status_rejects_refresh_token(
     assert response.status_code == 401
 
 
-def test_list_user_orders_forbidden_when_not_self(
-    client, fake_user, _override_orders_deps
-):
+def test_list_user_orders_forbidden_when_not_self(client, fake_user, _override_orders_deps):
     other_user_id = uuid4()
     response = client.get(
         f"/orders/user/{other_user_id}/",
@@ -231,9 +229,7 @@ def test_list_user_orders_forbidden_when_not_self(
     assert response.status_code == 403
 
 
-def test_list_user_orders_success(
-    client, fake_user, monkeypatch, _override_orders_deps
-):
+def test_list_user_orders_success(client, fake_user, monkeypatch, _override_orders_deps):
     import app.api.v1.orders as orders_module
 
     class FakeOrder:
@@ -248,7 +244,9 @@ def test_list_user_orders_success(
     async def fake_list_orders_by_user(session, user_id: UUID):
         return [FakeOrder(uuid4(), OrderStatus.PENDING), FakeOrder(uuid4(), OrderStatus.SHIPPED)]
 
-    monkeypatch.setattr(orders_module.orders_service, "list_orders_by_user", fake_list_orders_by_user)
+    monkeypatch.setattr(
+        orders_module.orders_service, "list_orders_by_user", fake_list_orders_by_user
+    )
 
     response = client.get(
         f"/orders/user/{fake_user.id}/",
@@ -259,4 +257,3 @@ def test_list_user_orders_success(
     payload = response.json()
     assert isinstance(payload, list)
     assert len(payload) == 2
-
