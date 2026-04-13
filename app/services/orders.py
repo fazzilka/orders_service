@@ -16,7 +16,6 @@ async def create_order(session: AsyncSession, user_id: UUID, order_in: OrderCrea
     )
     session.add(order)
     await session.commit()
-    await session.refresh(order)
     return order
 
 
@@ -28,7 +27,6 @@ async def update_order_status(session: AsyncSession, order: Order, status: Order
     order.status = status
     session.add(order)
     await session.commit()
-    await session.refresh(order)
     return order
 
 
@@ -37,4 +35,3 @@ async def list_orders_by_user(session: AsyncSession, user_id: UUID) -> list[Orde
         select(Order).where(Order.user_id == user_id).order_by(Order.created_at.desc())
     )
     return list(result.scalars().all())
-
