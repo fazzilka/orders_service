@@ -2,7 +2,6 @@ from fastapi import Response
 
 from app.core.config import settings
 
-
 USER_ACCESS_COOKIE = "user_access_token"
 USER_REFRESH_COOKIE = "user_refresh_token"
 
