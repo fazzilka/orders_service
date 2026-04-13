@@ -46,4 +46,3 @@ def test_user_token_service_access_and_refresh_claims() -> None:
     assert refresh_payload["email"] == email
     assert token_service.is_user_refresh(refresh_payload) is True
     assert token_service.is_user_access(refresh_payload) is False
-
