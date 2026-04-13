@@ -2,14 +2,13 @@ import asyncio
 import os
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from app.db.base import Base
+from alembic import context
 from app.db import models as _models  # noqa: F401
-
+from app.db.base import Base
 
 config = context.config
 
@@ -67,4 +66,3 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     asyncio.run(run_migrations_online())
-
