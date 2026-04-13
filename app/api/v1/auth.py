@@ -6,8 +6,8 @@ from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
-from app.core.config import settings
 from app.core.auth_cookies import USER_REFRESH_COOKIE, clear_user_cookies, set_user_cookies
+from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.core.security import create_access_token, create_refresh_token, get_user_token_service
 from app.schemas.auth import TokenPair, UserCreate, UserLoginRequest, UserRead
@@ -18,7 +18,6 @@ from app.services.users import (
     get_user_by_id,
 )
 
-
 router = APIRouter()
 
 
@@ -26,8 +25,11 @@ router = APIRouter()
 async def register(user_in: UserCreate, session: AsyncSession = Depends(get_db)) -> UserRead:
     try:
         user = await create_user(session, email=user_in.email, password=user_in.password)
-    except UserAlreadyExistsError:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
+    except UserAlreadyExistsError as err:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already registered",
+        ) from err
 
     return UserRead.model_validate(user)
 
