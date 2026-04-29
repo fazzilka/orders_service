@@ -9,7 +9,7 @@ logs:
 	docker compose logs -f api consumer celery-worker
 
 down:
-	docker compose down -v
+	docker compose down
 
 lint:
 	$(UV_DEV_RUN) ruff format .
